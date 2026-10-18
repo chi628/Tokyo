@@ -224,7 +224,7 @@ else if(b.id=="cn"){placing=null;stopEdit()}
 else if(b.id=="sv"){E.forEach(function(a){a.n=a.n.trim()||"未命名";a.r=a.r.filter(function(r){r.t=r.t.trim();return r.t})});R=toR(E);var data=JSON.parse(JSON.stringify({areas:E}));placing=null;stopEdit();if(dbRef)dbRef.doc("config/rides").set(data).catch(function(){document.getElementById("st").textContent="⚠️ 儲存失敗：只有擁有者或編輯者能修改清單。"})}});
 function stopEdit(){editing=false;document.getElementById("pc").textContent=PCT;document.getElementById("eb").style.display="";renderList()}
 
-var AVdb={},PL=null,PCKdb={},PM={},PE=null,pedit=false,pLoaded={};
+var pmsg="",AVdb={},PL=null,PCKdb={},PM={},PE=null,pedit=false,pLoaded={};
 var HSL=[["buzz","平頭"],["curl","捲髮"],["long","長直髮"],["bob","鮑伯"],["neat","短髮"],["slick","油頭"],["spiky","刺蝟頭"],["pig","雙馬尾"],["pony","小馬尾"],["wisp","稀疏"],["none","光頭"]],ESL=[["dot","圓眼"],["smile","笑眼"],["big","大眼"],["sleepy","瞇眼"]],MSL=[["smile","微笑"],["o","小嘴"],["flat","平嘴"],["grin","大笑"]];
 var HCS=["#1f1f27","#3a2a22","#5a3a2a","#7a4a2e","#b5793a","#d9b36a","#6b6b70","#d0d0d5","#e8579a","#4a90e2"],SKS=["#ffe2c6","#ffd3b0","#f3bd96","#d9a07a","#b57a54","#8a5a3c"],BGS=["#cfe3ff","#ffd9e4","#e3d9ff","#ffe6c2","#d4f1dd","#d9ecff","#fff1b8","#ffd1dc","#e8f6c8","#ffe0ec"];
 function refreshAll(){setMe();renderList();renderPack();if(pk.classList.contains("on"))openPk()}
@@ -255,7 +255,7 @@ pkl.innerHTML="<div class='nm'><b>我是</b><i class='av' id='pmeav'></i><b id='
 var pl2=document.getElementById("pl2");
 function renderPack(){if(pedit)return;var all={};for(var k in PCKdb)all[k]=PCKdb[k];if(cid)all[cid]=Object.keys(PM);var tot=0,dn=0;
 pl2.innerHTML=PL.map(function(c){return "<div class='ah'>"+esc(c.n)+"</div>"+c.items.map(function(it){tot++;if(PM[it.i])dn++;var w=CH.filter(function(x){return all[x.i]&&all[x.i].indexOf(it.i)>-1});return "<div class='rd"+(PM[it.i]?" on":"")+"' data-pi='"+esc(it.i)+"'><span class='ck'>"+(PM[it.i]?"✓":"")+"</span><div class='rn'>"+esc(it.t)+"<div class='who'>"+w.map(function(x){return "<span class='wc'><i class='av'>"+av(x.i)+"</i>"+x.n+"</span>"}).join("")+"</div></div></div>"}).join("")}).join("");
-document.getElementById("pst").textContent=(!cid?"請先選角色。":"我已打包 "+dn+" / "+tot+" 項。")+(dbRef&&!ro?"✅ 全家共用，清單與勾選會同步。":"📱 目前只存在這支手機。")}
+document.getElementById("pst").textContent=(!cid?"請先選角色。":"我已打包 "+dn+" / "+tot+" 項。")+(dbRef&&!ro?"✅ 全家共用，清單與勾選會同步。":"📱 目前只存在這支手機。")+(pmsg?" "+pmsg:"")}
 function savePk(){if(!cid)return;try{localStorage.setItem("pm_"+cid,JSON.stringify(PM))}catch(e){}if(dbRef&&!ro)dbRef.doc("pack/"+cid).set({done:Object.keys(PM),t:Date.now()}).catch(function(){})}
 function startPE(){PE=JSON.parse(JSON.stringify(PL));pedit=true;drawPE()}
 function drawPE(){pl2.innerHTML="<p class='st'>修改後按「完成並儲存」，全家都會看到新清單。</p>"+PE.map(function(c,ci){return "<div class='ah er'><input class='ei' data-pc='"+ci+"' value='"+esc(c.n)+"' aria-label='分類名稱'><button class='s' data-pdc='"+ci+"'>刪分類</button></div>"+c.items.map(function(it,ii){return "<div class='er'><input class='ei' data-pc='"+ci+"' data-pit='"+ii+"' value='"+esc(it.t)+"' placeholder='項目'><button class='s' data-pdi='"+ci+","+ii+"'>✕</button></div>"}).join("")+"<button class='s' data-pai='"+ci+"'>＋新增項目</button>"}).join("")+"<div style='margin-top:16px;display:flex;gap:8px;flex-wrap:wrap'><button class='s' data-pac='1'>＋新增分類</button><button data-psv='1'>完成並儲存</button><button class='s' data-pcn='1'>取消</button></div>"}
@@ -268,7 +268,7 @@ else if(d.pdi!==undefined){var q=d.pdi.split(",");PE[+q[0]].items.splice(+q[1],1
 else if(d.pdc!==undefined)PE.splice(+d.pdc,1);
 else if(d.pac)PE.push({n:"新分類",items:[]});
 else if(d.pcn){pedit=false;renderPack();return}
-else if(d.psv){PE.forEach(function(c){c.n=c.n.trim()||"未命名";c.items=c.items.filter(function(i){i.t=i.t.trim();return i.t})});PL=cleanPL(PE);pedit=false;try{localStorage.setItem("pl",JSON.stringify(PL))}catch(x){}if(dbRef&&!ro)dbRef.doc("pack/list").set({cats:PL}).catch(function(){});renderPack();return}
+else if(d.psv){PE.forEach(function(c){c.n=c.n.trim()||"未命名";c.items=c.items.filter(function(i){i.t=i.t.trim();return i.t})});PL=cleanPL(PE);pedit=false;try{localStorage.setItem("pl",JSON.stringify(PL))}catch(x){}pmsg="";if(dbRef&&!ro){pmsg="⏳ 同步中…";dbRef.doc("pack/list").set({cats:PL}).then(function(){pmsg="✅ 已同步給全家";renderPack()}).catch(function(){ro=true;pmsg="⚠️ 沒有編輯權限，清單只存在這支手機";renderPack()})}else pmsg="⚠️ 目前只存在這支手機，其他成員看不到（需擁有者把你設為 Contributor）";renderPack();return}
 drawPE();return}
 var r=e.target.closest(".rd");if(r){if(!cid){openPk();return}var id=r.dataset.pi;if(PM[id])delete PM[id];else PM[id]=1;savePk();renderPack()}});
 /* ---- background ---- */
