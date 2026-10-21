@@ -720,7 +720,7 @@ hud();drawNext();size()})();
 
 /* ===== 推播通知：App 沒開也能收到 =====
    把 Cloudflare Worker 的網址貼在下面引號裡（例：https://tokyo-push.xxx.workers.dev），留空 = 不送推播 */
-var PUSH_WORKER_URL="https://tokyo.miko82290.workers.dev/#1";
+var PUSH_WORKER_URL="https://tokyo.miko82290.workers.dev/#15";
 var VAPID_PUBLIC="BEpBEURmrbcePl4MSElYBjpTro1X4QU52pSnQwDPDPyg93w4lDPOXgLQVwNG6-4VQ6_ak9B5mj3P8ebbcM48BpM";
 window.PUSH=(function(){var DB={},last={},busy=0;
 function key(s){var p="=".repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,"+").replace(/_/g,"/")),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
