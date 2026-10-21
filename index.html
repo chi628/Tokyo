@@ -76,7 +76,7 @@ button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(
 .mw{position:relative}.pins{position:absolute;inset:0;pointer-events:none}.pin{position:absolute;transform:translate(-50%,-50%);min-width:24px;height:24px;border-radius:999px;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.45);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;padding:0 4px}.pin.ed{opacity:.8;width:14px;min-width:14px;height:14px;padding:0}.pin.mk{outline:3px solid var(--tab)}.pl{margin:2px 0 6px}
 
 nav{flex-wrap:wrap}
-.av{display:inline-block;width:22px;height:22px;border-radius:50%;overflow:hidden;vertical-align:middle;flex:none}.av svg{display:block;width:100%;height:100%}
+.avb{display:block;width:100%;height:100%;background-position:center;background-size:cover;background-repeat:no-repeat}.av{display:inline-block;width:22px;height:22px;border-radius:50%;overflow:hidden;vertical-align:middle;flex:none}.av svg{display:block;width:100%;height:100%}
 .pk{position:fixed;inset:0;background:rgba(40,44,52,.42);-webkit-backdrop-filter:grayscale(1) brightness(.85);backdrop-filter:grayscale(1) brightness(.85);z-index:20;display:none;align-items:center;justify-content:center;padding:16px}.pk.on{display:flex}.pkb.nudge{animation:shn .3s}
 .pkb{background:var(--paper);border-radius:18px;padding:18px 14px;max-width:420px;width:100%;max-height:85%;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:auto;text-align:center}.pkb h2{margin:0 0 4px;color:var(--navy)}.pkb p{margin:0 0 12px;color:var(--mute);font-size:13px}
 .pkg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pkg button{background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px}.pkg b{font-size:18px}.pkg small{color:var(--mute);font-size:12px}.pkg .av{width:64px;height:64px}
@@ -463,6 +463,13 @@ else{var bg=t=="big";e+="<ellipse cx='"+x+"' cy='"+y+"' rx='"+(er-.8+(bg?1.8:0))
 var mo=c.mo=="o"?"<ellipse cx='50' cy='"+(my+2)+"' rx='3' ry='3.6' fill='#c0504d'/>":c.mo=="flat"?"<path d='M44 "+(my+2)+"H56' stroke='#b5524e' stroke-width='2.3' stroke-linecap='round'/>":c.mo=="grin"?"<path d='M42 "+my+"Q50 "+(my+11)+" 58 "+my+"Z' fill='#c0504d'/>":"<path d='M43 "+my+"Q50 "+(my+7)+" 57 "+my+"' stroke='#b5524e' stroke-width='2.3' fill='none' stroke-linecap='round'/>";
 if(c.gl)X+="<g fill='none' stroke='#444' stroke-width='2'><circle cx='"+(50-ex)+"' cy='"+ey+"' r='"+(er+4.5)+"'/><circle cx='"+(50+ex)+"' cy='"+ey+"' r='"+(er+4.5)+"'/><path d='M"+(50-ex+er+4.5)+" "+ey+"H"+(50+ex-er-4.5)+"'/></g>";
 return "<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><rect width='100' height='100' fill='"+c.bg+"'/>"+B+"<circle cx='21' cy='"+ey+"' r='6' fill='"+sk+"'/><circle cx='79' cy='"+ey+"' r='6' fill='"+sk+"'/><circle cx='50' cy='56' r='"+(kd?31:29)+"' fill='"+sk+"'/>"+F+e+mo+X+"</svg>"}
+/* 頭像改用 CSS 背景：同一張圖只解碼一次，避免畫面重畫時塞入大量圖片資料造成手機記憶體不足閃退 */
+var AVST=document.createElement("style");document.head.appendChild(AVST);var AVM={},AVN=0,_av0=av;
+av=function(id){var h=_av0.apply(this,arguments),m=/^<img alt='' src='([^']+)'/.exec(h);if(!m)return h;var u=m[1],k=AVM[u];if(!k){k="avk"+(++AVN);AVM[u]=k;try{AVST.sheet.insertRule("."+k+"{background-image:url(\""+u+"\")}",AVST.sheet.cssRules.length)}catch(e){AVST.appendChild(document.createTextNode("."+k+"{background-image:url(\""+u+"\")}"))}}return "<b class='avb "+k+"'></b>"};
+/* 不在畫面上的頁面先不重畫，切換過去時再畫 */
+var LAZY={};function onPage(el){var p=el&&el.closest&&el.closest(".pg");return !p||p.classList.contains("cur")}
+function lazy(key,el,fn){if(onPage(el)){delete LAZY[key];return true}LAZY[key]=[el,fn];return false}
+setInterval(function(){for(var k in LAZY){var x=LAZY[k];if(onPage(x[0])){delete LAZY[k];try{x[1]()}catch(e){}}}},500);
 function toObj(a){return a.map(function(x){return {n:x[0],c:x[1],r:x[2].map(function(y){return {i:y[0],t:y[1],x:y[2],y:y[3]}})}})}function toR(a){return a.map(function(x){return [x.n,x.c,(x.r||[]).map(function(y){return [y.i,y.t,y.x,y.y]})]})}
 var PCT="圓點＝有人想玩的設施（頭貼＝是誰），點圓點看名單。點地圖可放大；位置為概略。";
 var editing=false,E=null,mine={},picks={},cid="",dbRef=null,ro=false,loaded={},dz=document.getElementById("dz"),CNT={},WHO={},placing=null;
@@ -573,7 +580,7 @@ function soBtn(t){return "<div class='pxtl'><button class='s"+(PSO?" on":"")+"' 
 function pxRow(it,all){var a=(it.m||[]).filter(function(x){return CHM[x]}),w=CH.filter(function(x){return all[x.i]&&all[x.i].indexOf(it.i)>-1}).map(function(x){return x.i});
 var chips=a.map(function(x){var ok=w.indexOf(x)>-1;return "<span class='wc as"+(ok?" ok":"")+"'><i class='av'>"+av(x)+"</i>"+esc(CHM[x].n)+(ok?" ✓":"")+"</span>"}).concat(w.filter(function(x){return a.indexOf(x)<0}).map(function(x){return "<span class='wc'><i class='av'>"+av(x)+"</i>"+esc(CHM[x].n)+" ✓</span>"})).join("");
 var hd=!!PH[it.i];return "<div class='rd"+(hd?" hid":PM[it.i]?" on":"")+"' data-pi='"+esc(it.i)+"'"+(hd?" aria-disabled='true'":"")+"><span class='ck'>"+(!hd&&PM[it.i]?"✓":"")+"</span><div class='rn'><span class='pt' data-ed='"+esc(it.i)+"'>"+(esc(it.t)||"&nbsp;")+"</span>"+(hd?"<small class='hn'>已隱藏（只有你看得到這個狀態）</small>":"")+"<div class='who'>"+chips+"</div></div><div class='rbt'><button class='tg' data-pm='"+esc(it.i)+"' aria-label='設定「"+esc(it.t)+"」由誰負責'>＋成員</button><button class='hb' data-ph='"+esc(it.i)+"' aria-pressed='"+hd+"'>"+(hd?"👁 顯示":"隱藏")+"</button></div></div>"}
-function renderPack(){if(pedit||pdrag)return;var all={};for(var k in PCKdb)all[k]=PCKdb[k];if(cid)all[cid]=Object.keys(PM);
+function renderPack(){if(pedit||pdrag)return;if(!lazy("pack",pkl,renderPack))return;var all={};for(var k in PCKdb)all[k]=PCKdb[k];if(cid)all[cid]=Object.keys(PM);
 if(!(PCAT<PL.length))PCAT=PL.length-1;if(PCAT<-1)PCAT=-1;if(PFM&&!CHM[PFM])PFM=null;
 var rail="<button role='tab' class='ov"+(PCAT<0&&!PFM?" on":"")+"' style='--c:#0b3b7a' data-pcat='-1' aria-selected='"+(PCAT<0&&!PFM)+"'>總覽</button>"+PL.map(function(c,ci){var on=PCAT==ci&&!PFM;return "<button role='tab' class='"+(on?"on":"")+"' style='--c:"+pxc(ci)+"' data-pcat='"+ci+"' aria-selected='"+on+"'>"+(esc(c.n)||"新分類")+"</button>"}).join("");
 var RX=document.getElementById("pxr"),sl=RX.scrollLeft;RX.innerHTML=rail;RX.style.setProperty("--cc",PFM||PCAT<0?"#0b3b7a":pxc(PCAT));RX.scrollLeft=sl;var key=PFM?"m"+PFM:PCAT;if(PXL!==key){PXL=key;var ab=RX.querySelector("button.on");if(ab)RX.scrollLeft=Math.max(0,ab.offsetLeft-RX.clientWidth/2+ab.offsetWidth/2)}
@@ -803,7 +810,7 @@ if(mode=="battle")render()};
 /* ---- render ---- */
 function chip(p,cls,score){return "<span class='gpc"+(cls||"")+"'><i class='av'>"+av(p)+"</i><b>"+esc(nm(p))+"</b>"+(score!=null?"<em>"+score+"</em>":"")+"</span>"}
 function lastHTML(){var l=room&&room.last;if(!l||now()-resT>4500||!room)return "";var w=nm(l.who);if(l.ok)return "<div class='gres ok'>🎉 "+esc(w)+" 最快答對！<br><b>"+esc(l.e)+" = 24</b></div>";if(l.sol)return "<div class='gres'>上一題答案："+esc(l.sol)+" = 24</div>";return ""}
-function render(){var h="<div class='gmode'><button data-md='solo' class='"+(mode=="solo"?"on":"")+"'>單人</button><button data-md='battle' class='"+(mode=="battle"?"on":"")+"'>連線對戰</button></div>";
+function render(){if(!lazy("g24",host,render))return;var h="<div class='gmode'><button data-md='solo' class='"+(mode=="solo"?"on":"")+"'>單人</button><button data-md='battle' class='"+(mode=="battle"?"on":"")+"'>連線對戰</button></div>";
 if(mode=="solo"){if(!solo.P)soloNew();var t=solo.done?"-":Math.floor((now()-solo.t0)/1000);h+="<div class='gbar'><span>已解 <b>"+solo.n+"</b> 題</span><span>連續 <b>"+solo.streak+"</b></span><span>⏱ <b id='g24t'>"+t+"</b> 秒</span><span>最快 <b>"+(solo.best||"-")+"</b> 秒</span></div>"+exHTML(solo.done)+"<p class='gmsg'>"+(msg||"用 + − × ÷ 和括號，把四個數字都用一次算出 24")+"</p><div class='gact'><button data-a='ok' class='gok'"+(solo.done?" disabled":"")+">送出</button><button class='s' data-a='skip'>換一題</button><button class='s' data-a='show'>看答案</button></div>"}
 else if(!cid)h+="<p class='gmsg'>請先在封面右上角選好你的角色</p>";
 else if(!online())h+="<p class='gmsg'>連線對戰需要網路，而且要能同步（狀態列沒有顯示「共用中」時無法對戰）。<br>沒有網路時可以先玩單人模式。</p>";
@@ -940,7 +947,7 @@ function lastMsg(id){var v=CVD[id];if(!v||!v.l||!v.l.length)return null;var e=v.
 function visitors(){if(!cid)return [];return CH.map(function(c){return c.i}).filter(function(w){return w!==cid&&VS[w]&&VS[w].to===cid&&Date.now()-(VS[w].t||0)<AWAYMS})}
 var HQ=["歡迎光臨！","要喝茶嗎？🍵","吃飽沒？","我家有點亂 😅","咕咕咕！","慢走，下次再來～"];
 var TOUCH=0,PENDR=0;host.addEventListener("pointerdown",function(){TOUCH=1},true);host.addEventListener("touchstart",function(){TOUCH=1},{capture:true,passive:true});function untouch(){setTimeout(function(){TOUCH=0;if(PENDR){PENDR=0;render()}},450)}host.addEventListener("pointerup",untouch,true);host.addEventListener("pointercancel",untouch,true);host.addEventListener("touchend",untouch,{capture:true,passive:true});
-function render(force){if(TOUCH&&!force){PENDR=1;return}if(!bgEl){bgEl=document.createElement("div");bgEl.className="chbg";host.appendChild(bgEl);wEl=document.createElement("div");wEl.className="chw";host.appendChild(wEl)}
+function render(force){if(TOUCH&&!force){PENDR=1;return}if(!force&&bgEl&&!lazy("chk",host,function(){render()}))return;if(!bgEl){bgEl=document.createElement("div");bgEl.className="chbg";host.appendChild(bgEl);wEl=document.createElement("div");wEl.className="chw";host.appendChild(wEl)}
 var sc=scene(),tdv=tod(),bk2=sc+"|"+tdv;if(bgK!==bk2){bgK=bk2;bgEl.innerHTML=SCENE(sc,tdv)}
 var fr0=host.querySelector(".chfr div"),sl0=fr0?fr0.scrollLeft:0;if(!view)view=cid||"";var mine=view&&view===cid,L=view?of(view):[],n=L.length,st=stage(n),nx=SNEED[st],pv=st?SNEED[st-1]:0,pct=st>=3?100:Math.round((n-pv)/(nx-pv)*100);
 var counts={};all().forEach(function(x){counts[x.w]=(counts[x.w]||0)+1});
